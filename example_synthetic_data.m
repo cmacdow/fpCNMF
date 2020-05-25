@@ -1,8 +1,8 @@
-%% SYNTHETIC DATA EXAMPLE PIPELINE
+%% example analysis pipeline for synthetic data
 
 %Generate Synthetic Data
 rng('default');
-[data, W_orig] = GenerateSyntheticData('verbose',1,'N',50,'T',500,'sigma_data',0.05,'L',15,'K',4,'blocks',10); sgtitle('Example Data Block');
+[data, W_orig] = GenerateSyntheticData('verbose',1,'N',50,'T',500,'sigma_data',0.025,'L',15,'K',4,'blocks',10); sgtitle('Example Data Block');
 
 %Split into equal numbers of test/train blocks
 data_train = data(1:2:end);
@@ -17,12 +17,15 @@ opts = SyntheticDataOptions();
 stats_train = cell(1,numel(data_train));
 stats_test = cell(1,numel(data_train));
 W = cell(1,numel(data_train));
+
+%run example fits in parallel 
+parpool(parcluster('local'));
 for block = 1:numel(data_train)
     fprintf('\n Working on block %d of %d',block,numel(data_train));   
     if block ==1 %generate example figures
-        [W{block}, stats_train{block}, stats_test{block}] = FitMotifs(data_train,data_test,opts,genfigs);    
+        [W{block}, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,1);    
     else
-        [W{block}, stats_train{block}, stats_test{block}] = FitMotifs(data_train,data_test,opts,0);    
+        [W{block}, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,0);    
     end
 end
 

@@ -54,6 +54,7 @@ set(gca,'box','off','Clipping','off','XColor','none','YColor','none')
 set(gca,'XTick',tickval,'YTick',tickval,'TickDir','out','XTickLabelRotation',90);
 xlabel('Cluster IDs');
 ylabel('Cluster IDs');
+title('Similarity Between Discovered Motifs','FontWeight',fp.font_weight,'FontSize',fp.font_size);
 axis square
 fp.FormatAxes(gca);
 

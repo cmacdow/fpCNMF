@@ -6,21 +6,18 @@ function [W, stats_train, stats_test] = FitandValidateMotifs(data_train,data_tes
 %Determine the number of non-penalized iterations
 opts.non_penalized_iter = DetermineNonPenalizedIterations(data_train,[],opts,genfigs);
 
-%Fit Lambda
-if genfigs %generate figures for an example block
-    lambda = FitLambda(data_train{block},[],opts,1);
-    title('Automated Lambda Selection','Fontweight','normal','Fontsize',16);
-else %no figures
-    lambda = FitLambda(data_train{block},opts,0);
+%Optionally Fit Lambda Penalty Term
+if numel(opts.lambda)>1
+    lambda = FitLambda(data_train,[],opts,genfigs);
 end
 
 %Fit Motifs To Training Data And Collect Statistics
-[W{block},H,stats_train{block}] = fpCNMF(data_train,'L',opts.L,'K',opts.K,'non_penalized_iter',...
+[W,H,stats_train] = fpCNMF(data_train,'L',opts.L,'K',opts.K,'non_penalized_iter',...
     opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
     'speed','fast','verbose',0,'lambda',lambda);
 
 %Remove Empty Motifs 
-[W{block},H] = RemoveEmptyMotifs(W,H);
+[W,H] = RemoveEmptyMotifs(W,H);
 
 if genfigs %visualize example fit
     VisualizeData(data_train,W,H); 
@@ -34,7 +31,7 @@ end
 
 if genfigs %visualize example fit
     VisualizeData(data_test,Wxval,Hxval);
-    sgtitle('Example Fit To Testing Data, Block','Fontweight','normal','Fontsize',16); drawnow
+    sgtitle('Example Fit To Testing Data','Fontweight','normal','Fontsize',16); drawnow
 end  
 
 end
