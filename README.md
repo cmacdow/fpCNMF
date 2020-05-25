@@ -7,7 +7,9 @@ Our work: MacDowell and Buschman,
 
 Previously published algorithms:
 pMU_CNMF: penalized multiplicative CNMF, based on the (amazing) seqNMF toolbox from (https://github.com/FeeLab/seqNMF)
+
 ANLS_CNMF: alternative non-negative least square CNMF. MATLAB implemenation from (https://github.com/degleris1/CMF.jl)
+
 PhenoCluster: unsupervised clustering algorithm, based on (https://github.com/jacoblevine/PhenoGraph)
 
 #### NOTE: this package is currently under development. Please feel free to reach out to camdenm@princeton.edu if you have any questions. 
