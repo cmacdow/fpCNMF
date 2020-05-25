@@ -1,0 +1,76 @@
+%% SYNTHETIC DATA EXAMPLE PIPELINE
+
+%Generate Synthetic Data
+rng('default');
+[data, W_orig] = GenerateSyntheticData('verbose',1,'N',50,'T',500,'sigma_data',0.05,'L',15,'K',4,'blocks',10); sgtitle('Example Data Block');
+
+%Split into equal numbers of test/train blocks
+data_train = data(1:2:end);
+data_test = data(2:2:end);
+data_train = data_train(1:min(numel(data_train),numel(data_test)));
+data_test = data_test(1:min(numel(data_train),numel(data_test)));
+
+%get configurable fitting options
+opts = SyntheticDataOptions();
+
+%fit to all the recording blocks
+stats_train = cell(1,numel(data_train));
+stats_test = cell(1,numel(data_train));
+W = cell(1,numel(data_train));
+for block = 1:numel(data_train)
+    fprintf('\n Working on block %d of %d',block,numel(data_train));   
+    if block ==1 %generate example figures
+        [W{block}, stats_train{block}, stats_test{block}] = FitMotifs(data_train,data_test,opts,genfigs);    
+    else
+        [W{block}, stats_train{block}, stats_test{block}] = FitMotifs(data_train,data_test,opts,0);    
+    end
+end
+
+% Visualize General Motifs Statistics
+% CrossValidationFigures(stats_train,stats_test) %pending
+
+% Cluster Motifs
+W_basis = ClusterW(W,opts);
+
+% Compare the basis motifs to the original motifs
+Plot_CompareWs(W_orig,W_basis);
+
+%Refit to all the data
+data_all = cat(2,data{:}); %entire "recording"
+
+%Recompute statistics that can change as a function of numel(data);
+opts.non_penalized_iter = DetermineNonPenalizedIterations(data_all,W_basis,opts,1);
+
+lambda = FitLambda(data_all,W_basis,opts,1); title('Automated Lambda Selection, Entire Recording','Fontweight','normal','Fontsize',16);
+
+%Refit temporal weightings
+[~,H,stats] = fpCNMF(data_all,'non_penalized_iter',...
+    opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
+    'speed','normal','verbose',0,'lambda',lambda,'w_update_iter',0,'W',W_basis);
+    
+%Visualize
+VisualizeData(data_all,W_basis,H); sgtitle('Example Fit To Entire Recording','Fontweight','normal','Fontsize',16); 
+CNMF_Stats(W_basis,H,data_all);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
