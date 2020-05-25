@@ -6,6 +6,7 @@ If you use this package in published work, please cite our work and the amazing 
 Our work: CJ MacDowell, TJ Buschman. Low-Dimensional Spatio-Temporal Dynamics Underlie Cortex Wide Neural Activity. Biorxiv 2020 https://doi.org/10.1101/2020.01.05.895177
 
 Previously published algorithms:
+
 pMU_CNMF: penalized multiplicative CNMF, based on the (amazing) seqNMF toolbox from (https://github.com/FeeLab/seqNMF)
 
 ANLS_CNMF: alternative non-negative least square CNMF. MATLAB implemenation from (https://github.com/degleris1/CMF.jl)
