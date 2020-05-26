@@ -2,7 +2,7 @@
 
 %Generate Synthetic Data
 rng('default');
-[data, W_orig] = GenerateSyntheticData('verbose',1,'N',50,'T',500,'sigma_data',0.025,'L',15,'K',4,'blocks',10); sgtitle('Example Data Block');
+[data, W_orig] = GenerateSyntheticData('verbose',1,'N',50,'T',500,'sigma_data',0.01,'L',15,'K',4,'blocks',10); sgtitle('Example Data Block');
 
 %Split into equal numbers of test/train blocks
 data_train = data(1:2:end);
