@@ -1,49 +1,40 @@
-function FitKandL(X,K_range,L_range)
-%we want to choose a K and L that maximize out fit to the data
-L_range = [5:5:25];
-K_range = [1:7];
-X = data{1};
-sweep = combvec(K_range,L_range);
-sweep = K_range;
-sweep =L_range;
-%%
-diss = [];
-pev = [];
+function [K, L, fh] = FitKandL(X,opts,genfigs)
+%Camden MacDowell - timeless. Follows Mackevivious et al., 2018, eLife
+if nargin <4; genfigs =1; end
+
+%Sweep K and L together
+if opts.verbose; fprintf('\n Fitting L an K'); end
+
+sweep = combvec(opts.L,opts.K);
+
+stats = cell(1,size(sweep,2));
 for i = 1:size(sweep,2)
-    fprintf('\n%d of %d',i,size(sweep,2))
-    for rep = 1:5
-%         [W, H] = fpCNMF(X,'K',3,'L',sweep(1,i),'non_penalized_iter',10,'penalized_iter',0,'speedy',1);            
-        [W, H] = fpCNMF(X,'K',sweep(1,i),'L',50,'non_penalized_iter',10,'penalized_iter',0,'speedy',1);  
-        if rep>1
-           diss(i,rep-1) = DissimilarityX(H,W,H_prev,W_prev); 
-        end
-        W_prev = W;
-        H_prev = H;
-        stats = CNMFStats(W,H,X,0);
-        pev(i,rep) = stats.pev;
-    end
+    if opts.verbose; fprintf('\n\t ........ Fitting Lambda %d of %d ...........', i,numel(opts.lambda)); end
+    [~,~,stats{i}] = fpCNMF(X,'L',sweep(1,i),'K',sweep(2,i),'non_penalized_iter',opts.max_non_penalized_iter,'penalized_iter',0,...
+        'speed','fast','verbose',0,'lambda',0);        
+end
+pev = arrayfun(@(x) stats{x}.pev, 1:numel(stats),'UniformOutput',1);
+
+% get peak pev 
+[~,idx] = max(pev);
+L = ceil(sweep(1,idx)*1.1);
+K = ceil(sweep(2,idx)*1.1);
+
+%optionally make figures;
+if genfigs
+   fp = fig_params;
+   figure;
+   [xq,yq] = meshgrid(linspace(min(sweep(1,:)),max(sweep(1,:)),100),linspace(min(sweep(2,:)),max(sweep(1,:)),100));
+   vq = griddata(sweep(1,:),sweep(2,:),pev,xq,yq);
+   mesh(xq,yq,vq)
+   hold on
+   plot3(sweep(1,:),sweep(2,:),pev,'o')
+   plot3([L,L],[K,K],[0 1],'color','k','linewidth',2)   
+   xlabel('L'); ylabel('K'); zlabel('PEV');
+   title('Automated K and L Selection','Fontweight',fp.font_weight,'Fontsize',fp.font_size)
+   fh = gcf;
+else
+   fh = [];
 end
 
-%pev near the plateau and lower variance in the pev
-
-%APPROXIMATE L By looking at the duration of bursts in the data
-
-figure; hold on; plot(K_range,nanmean(diss,2)); plot(K_range,nanmean(pev,2));
-figure; hold on; plot(L_range,nanmean(diss,2)); plot(L_range,nanmean(pev,2));
-%%
-
-figure; hold on;
-plot(sweep(1,:),pev)
-plot(sweep(2,:),pev)
-
-
-%sweep; we don't care how sparsely we fit the data. 
-
-
-%%TOMORROW WRITE THE MULTIPLICATIVE UPDATE ALGORITHM FOR YOUR VERSION
-
-%plot the explained variance
-
- [W, H] = fpCNMF(X,'K',5,'L',20,'non_penalized_iter',10,'penalized_iter',0,'speedy',1);
- VisualizeData(tensor_convolve(W,H),W,H)
- 
+end
