@@ -30,7 +30,7 @@ for block = 1:numel(data_train)
 end
 
 % Visualize General Motifs Statistics
-% CrossValidationFigures(stats_train,stats_test) %pending
+FittingResults(stats_train,stats_test,opts);
 
 % Cluster Motifs
 W_basis = ClusterW(W,opts);
@@ -42,7 +42,7 @@ Plot_CompareWs(W_orig,W_basis);
 data_all = cat(2,data{:}); %entire "recording"
 
 %Recompute statistics that can change as a function of numel(data);
-opts.non_penalized_iter = DetermineNonPenalizedIterations(data_all,W_basis,opts,1);
+opts.non_penalized_iter = FitNonPenalizedIterations(data_all,W_basis,opts,1);
 
 lambda = FitLambda(data_all,W_basis,opts,1); title('Automated Lambda Selection, Entire Recording','Fontweight','normal','Fontsize',16);
 

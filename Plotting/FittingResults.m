@@ -1,4 +1,4 @@
-function CrossValidationFigures(stats_train,stats_test)
+function FittingResults(stats_train,stats_test,opts)
 
 fp = fig_params; 
 
@@ -29,6 +29,18 @@ fp.SetTitle(gca,'Comparing Explained Variance');
 fp.FigureSizing(gcf,[2 2 5 8],[])
 
 %plot the number of discovered motifs
+if numel(opts.K)==1
+    figure; hold on; 
+    h = histogram([stats_train(:).n_motifs],'BinWidth',1);
+    maxcount = max(h.Values);
+    plot([opts.K,opts.K],[0,maxcount],'linewidth',2,'color','k');
+    xlabel('Number of Motifs'); 
+    ylabel('Number of Blocks');
+    fp.FormatAxes(gca);
+    fp.SetTitle(gca,{'Evaluating Number of';'Discovered Motifs'});
+    fp.FigureSizing(gcf,[2 2 5 7],[]);
+end
+
 
 end %function end
 

@@ -16,22 +16,33 @@ rng('default');
 %catch to only use k values at smaller than 1/4th the the size of the data
 opts.k_range(opts.k_range>floor(size(X,1))/2)=[]; 
 
-ovr_q = NaN(opts.number_resamples,numel(opts.k_range));
 num_clust = NaN(opts.number_resamples,numel(opts.k_range));
 for i = 1:numel(opts.k_range) 
     if opts.verbose; fprintf('\n Working on k value %d of %d', i, numel(opts.k_range)); end
-    for j = 1:opts.number_resamples
-        y = datasample(1:1:size(X,1),size(X,1),'Replace',true);
-        [idx, ~, ovr_q(j,i)] = PhenoCluster(X(y,y),'k',opts.k_range(i),'louvain_restarts',opts.louvain_restarts,'Verbose',0);   
+    if opts.number_resamples >1 %if resampling
+        for j = 1:opts.number_resamples
+            y = datasample(1:1:size(X,1),size(X,1),'Replace',true);
+            idx = PhenoCluster(X(y,y),'k',opts.k_range(i),'louvain_restarts',opts.louvain_restarts,'Verbose',0);   
+            if size(idx,2)>1
+                idx = idx(:,end); %phenograph likes to over cluster so use the least clustered level if multiple
+            end
+            num_clust(j,i) = numel(unique(idx));
+        end
+    else
+        idx = PhenoCluster(X,'k',opts.k_range(i),'louvain_restarts',opts.louvain_restarts,'Verbose',0);   
         if size(idx,2)>1
             idx = idx(:,end); %phenograph likes to over cluster so use the least clustered level if multiple
         end
-        num_clust(j,i) = numel(unique(idx));
+        num_clust(i) = numel(unique(idx));
     end
 end
 
 %Approximate Clusters by taking the elbow in the number of discovered clusters. 
-avg_n = nanmean(num_clust);
+if size(num_clust,1) >1 %is resampled
+    avg_n = nanmean(num_clust);
+else
+    avg_n =num_clust;
+end
 idx = Elbow_pt(avg_n,[],1);
 kval = opts.k_range(idx);
 
@@ -43,6 +54,7 @@ if opts.genfigs
    plot(opts.k_range(idx),avg_n(idx),'X','color','k','linewidth',1.25,'markersize',15);
    ylabel('Number of Clusters');
    xlabel('Number of Neighbors');
+   title('Autofitting PhenoCluster KNN','FontSize',fp.font_size,'Fontweight',fp.font_weight);
    fp.FormatAxes(gca);
    fh = gcf;
 else

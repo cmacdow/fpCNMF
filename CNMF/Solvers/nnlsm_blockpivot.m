@@ -33,6 +33,7 @@
 %                  Failure could only happen on a numericall very ill-conditioned problem.
 
 function [ X,Y,iter,success ] = nnlsm_blockpivot( A, B, isInputProd, init )
+  
     if nargin<3, isInputProd=0;, end
     if isInputProd
         AtA = A;, AtB = B;
@@ -108,4 +109,5 @@ function [ X,Y,iter,success ] = nnlsm_blockpivot( A, B, isInputProd, init )
         NotGood = sum(NonOptSet)+sum(InfeaSet);
         NotOptCols = NotGood > 0;
     end
+
 end

@@ -1,4 +1,4 @@
-function [num_iter, fh]= DetermineNonPenalizedIterations(X,W,opts,verbose)
+function [num_iter, fh]= FitNonPenalizedIterations(X,W,opts,verbose)
 %Camden MacDowell - timeless
 
 if nargin <4; verbose = 1; end
