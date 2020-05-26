@@ -10,7 +10,7 @@ opts = ParseOptionalInputs(opts,varargin);
 %compute the knn indices
 idx_knn = nan(size(X,1),opts.k);
 for i = 1:size(X,1)
-    [~,idx_knn(i,:)] = maxk(X(i,:),opts.k); 
+   [~,idx_knn(i,:)] = maxk(X(i,:),opts.k); 
 end
 
 % Now apply Jacard similarity to create connectivity graph

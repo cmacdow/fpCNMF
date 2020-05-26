@@ -18,19 +18,20 @@ stats_train = cell(1,numel(data_train));
 stats_test = cell(1,numel(data_train));
 W = cell(1,numel(data_train));
 
-%get an (over) approximation of K and/or L using 1 example block
+%get an (over)approximation of K and/or L using 1 example block
 if numel(opts.K)>1 && numel(opts.L)==1 %fit K for a given L
-    opts.K = FitK(data_train{1},opts,1);
+    opts.K = FitK(data_train,opts,genfigs);
 elseif numel(opts.L)>1 && numel(opts.K)==1 %fit L for a given K
-    opts.L = FitL(data_train{1},opts,1);
+    opts.L = FitL(data_train,opts,genfigs);
 elseif numel(opts.L)>1 && numel(opts.K)>1 %fit together (usually not necessary)
-     [opts.K, opts.L] = FitKandL(data_train{1},opts,1);
+     [opts.K, opts.L] = FitKandL(data_train,opts,genfigs);
 else %Use the existing K and L
 end
 
+
 %run example fits in parallel 
 parpool(parcluster('local'));
-parfor block = 1:numel(data_train)
+for block = 1:numel(data_train)
     fprintf('\n Working on block %d of %d',block,numel(data_train));   
     if block ==1 %generate example figures
         [W{block}, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,1);    

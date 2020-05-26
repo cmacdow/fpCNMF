@@ -1,16 +1,6 @@
 function [W, stats_train, stats_test] = FitandValidateMotifs(data_train,data_test,opts,genfigs)
 %Camden MacDowell - timeless
 
-%Optionally Fit K and L. Seperately or together
-if numel(opts.K)>1 && numel(opts.L)==1 %fit K for a given L
-    opts.K = FitK(data_train,opts,genfigs);
-elseif numel(opts.L)>1 && numel(opts.K)==1 %fit L for a given K
-    opts.L = FitL(data_train,opts,genfigs);
-elseif numel(opts.L)>1 && numel(opts.K)>1 %fit together (usually not necessary)
-     [opts.K, opts.L] = FitKandL(data_train,opts,genfigs);
-else %Use the existing K and L
-end
-
 %Determine the number of non-penalized iterations
 opts.non_penalized_iter = FitNonPenalizedIterations(data_train,[],opts,genfigs);
 

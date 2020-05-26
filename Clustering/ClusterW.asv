@@ -24,15 +24,16 @@ end
 
 %Cluster using desired method
 switch opts.clust_method
-    case 'PhenoCluster' %use phenograph
+    case PhenoCluster %use phenograph
         if numel(opts.clust_knn)>1 %optionally estimate a reasonable k value
-            [kval, ~] = FitPhenoK(tcorr_mat,'k_range',opts.clust_knn,'louvain_restarts',opts.clust_louvain_restarts,'genfigs',1,'verbose',1);
+            [kval, ~] = FitPhenoK(tcorr_mat,'k_range',opts.clust_knn,'louvain_restarts',opts.clust_louvain_restarts,'genfigs',1,...
+                'verbose',1);
         else; kval = opts.clust_knn; 
         end
         [cluster_idx, idx_knn, ovr_q] = PhenoCluster(tcorr_mat,'k',kval,'louvain_restarts',opts.clust_louvain_restarts,'Verbose',1);   
         if size(cluster_idx,2) > 1; cluster_idx = cluster_idx(:,end); end %just take the initital clustering level 
         
-    case 'DBSCAN' %use DBSCAN
+    case DBSCAN %use DBSCAN
         diss_tcorr_mat = 1-tcorr_mat; %DBSCAN uses a dissimilarity matrix. 
         if isempty(opts.clust_epsilon)
            opts.clust_epsilon = FitDBSCANepsilon(diss_tcorr_mat, opts.clust_minpts, 1);
