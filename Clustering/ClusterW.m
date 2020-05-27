@@ -43,7 +43,6 @@ switch opts.clust_method
 end
         
         
-
 %visualize cross correlation matrix
 Plot_OrderedSimilarityMatrix(tcorr_mat,cluster_idx);
 
