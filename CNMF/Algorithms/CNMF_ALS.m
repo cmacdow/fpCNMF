@@ -24,7 +24,7 @@ end
 %update W
 h_block = BlockH(H,L); %make H into a block matrix format
 
-if update_W %option to skip w_update if set to 0; 
+if update_W ==1 %option to skip w_update if set to 0; 
     %Compute the nnls
     W_stacked = nnlsm_blockpivot(h_block', X',0); 
     %stack w

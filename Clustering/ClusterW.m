@@ -1,7 +1,9 @@
-function [W_basis, kval, ovr_q, cluster_idx, idx_knn, tcorr_mat, handles] = ClusterW(W,opts)
+function [W_basis, kval, ovr_q, cluster_idx, idx_knn, tcorr_mat, handles] = ClusterW(W,opts,nanpxs)
 %camden macdowell - timeless
 %file_list is the full path of each file with motifs to cluster. motifs are
 %contained in variable 'w' as a pxl x motif x time tensor
+
+if nargin <3; nanpxs = []; end %masked pixels for imaging data
 
 if iscell(W) %combine mutliple CNMF Fits stored in a cell array
    W = cat(2,W{:});
@@ -14,7 +16,7 @@ W = RemoveEmptyMotifs(W);
 
 %optional 2D or 3D gaussian smooth. Reccomended for noisy data. 
 if ~isempty(opts.clust_smooth_kernel)
-    W_smooth = GaussianSmoothTensor(W,opts.clust_smooth_kernel);
+    W_smooth = GaussianSmoothTensor(W,opts.clust_smooth_kernel,opts.originaldimensions,nanpxs);
 else
     W_smooth = W; 
 end

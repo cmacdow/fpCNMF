@@ -11,14 +11,14 @@ if isempty(W)
     for i = 1:numel(opts.lambda)
         if opts.verbose; fprintf('\n\t ........ Fitting Lambda %d of %d ...........', i,numel(opts.lambda)); end
         [W,H] = fpCNMF(X,'L',opts.L,'K',opts.K,'non_penalized_iter',opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
-            'speed','fast','verbose',0,'lambda',opts.lambda(i));
+            'speed','fast','verbose',0,'lambda',opts.lambda(i),'ortho_H',opts.ortho_H);
         [cost(i),reg(i)] = CNMF_CostAndReg(X,W,H);
     end
 else %just fit Hs
     for i = 1:numel(opts.lambda)
         if opts.verbose; fprintf('\n\t ........ Fitting Lambda %d of %d ...........', i,numel(opts.lambda)); end
         [W,H] = fpCNMF(X,'non_penalized_iter',opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
-            'speed','fast','verbose',0,'lambda',opts.lambda(i),'W_update',0,'W',W);
+            'speed','fast','verbose',0,'lambda',opts.lambda(i),'W_update',0,'W',W,'ortho_H',opts.ortho_H);
         [cost(i),reg(i)] = CNMF_CostAndReg(X,W,H);
     end
 end

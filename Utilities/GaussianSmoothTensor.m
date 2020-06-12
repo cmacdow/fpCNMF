@@ -1,7 +1,7 @@
-function X = GaussianSmoothTensor(X,kernel,xydimensions)
+function X = GaussianSmoothTensor(X,kernel,xydimensions,nanpxs)
 %Camden MacDowell - timeless. X is a N x K x L tensor. 
 
-if nargin <3; xydimensions = []; end
+if nargin <3; xydimensions = 1; end
 
 [N, K, L] = size(X); 
 
@@ -11,7 +11,7 @@ if numel(kernel) == 1 %Smooth each N across L (per K).
     for k = 1:K
         X(:,k,:)= smoothdata(squeeze(X(:,k,:)),2,'gaussian',kernel);
     end
-elseif numel(kernel) ==2 
+elseif numel(kernel) ==2 && xydimensions(1)>1 && xydimensions(2)>1
     %for imaging data. For each K converts N x L into P x P x L and spatially smooths
     fprintf('\nSmoothing tensor in space....');
     for k = 1:K        
@@ -20,7 +20,7 @@ elseif numel(kernel) ==2
         temp = conditionDffMat(temp)';
         X(:,k,:) = reshape(temp,N,1,L);        
     end
-elseif numel(kernel) == 3 && ~isempty(xydimensions)
+elseif numel(kernel) == 3 && xydimensions(1)>1 && xydimensions(2)>1
     %for imaging data. For each K converts N x L into P x P x L and smoothes across space and time. 
     fprintf('\nSmoothing tensor in space and time....');
     for k = 1:K        

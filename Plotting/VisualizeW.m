@@ -14,6 +14,8 @@ if concat_flag
    W_concat = zeros(N,(L+gap)*K); %add small gap between Ws
    idx = cell(1,K);
    for i = 1:K
+       temp = cat(2,squeeze(W(:,i,:)),zeros(N,gap));       
+       temp = temp/max(temp(:));
        W_concat(:,((i-1)*(L+gap)+1) : (i*(L+gap))) = cat(2,squeeze(W(:,i,:)),zeros(N,gap));       
        idx{i} = [((i-1)*(L+gap))+0.5,(i*(L+gap))-1.5]; %get indices of motif
    end

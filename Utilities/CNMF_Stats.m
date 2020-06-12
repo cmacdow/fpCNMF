@@ -28,12 +28,12 @@ end
 
 %loadings of each w
 K = size(H,1); 
-stats.loadings = zeros(1,K);        
+temploadings = zeros(1,K);        
 for i = 1:K
     temp = tensor_convolve(W(:,i,:),H(i,:)); 
-    stats.loadings(i) = CalculateExplainedVariance(X,X-temp);
+    temploadings(i) = CalculateExplainedVariance(X,X-temp);
 end
-stats.loadings = stats.loadings/sum(stats.loadings);
+stats.loadings = {temploadings/sum(temploadings)};
 
 %final cost
 stats.cost= sqrt(mean((X(:)-Xhat(:)).^2));

@@ -41,19 +41,22 @@ H = [zeros(opts.K,opts.L),max(X(:))*rand(opts.K,T),zeros(opts.K,opts.L)];
 
 %generate vector of fit types (could be expanded to include different algs
 fit_type = [ones(1,opts.non_penalized_iter),zeros(1,opts.penalized_iter)];
+update_w_idx = cat(2,[1:opts.w_update_iter:opts.non_penalized_iter],[1:opts.w_update_iter:opts.penalized_iter]);
+update_w = zeros(1,numel(fit_type));
+update_w(update_w_idx)=1;
 
 %% CNMF
 
 switch opts.speed 
     case 'fast' %barebones. just fit. no reconstructions
         if opts.verbose; fprintf('\n\tZoom zoom! Speediness activated! Only final statistics computed\n');  end
-        for iter = 1:numel(fit_type) 
+        for iter = 1:numel(fit_type)                 
             if fit_type(iter) == 1 
-                [W,H] = CNMF_ALS(X,W,H,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_ALS(X,W,H,update_w(iter));
             else
-                [W,H] = CNMF_pMU(X,W,H,opts,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_pMU(X,W,H,opts,update_w(iter));
             end
-        end  
+        end
         stats =CNMF_Stats(W,H,X,1);
         
         
@@ -62,9 +65,9 @@ switch opts.speed
         stats = CNMF_Stats(W,H,X,1);        
         for iter = 1:numel(fit_type)                 
             if fit_type(iter) == 1 
-                [W,H] = CNMF_ALS(X,W,H,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_ALS(X,W,H,update_w(iter));
             else
-                [W,H] = CNMF_pMU(X,W,H,opts,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_pMU(X,W,H,opts,update_w(iter));
             end
             stats(1,iter+1) = CNMF_Stats(W,H,X,1);
         end
@@ -72,19 +75,18 @@ switch opts.speed
             
     case 'diagnostic'
         if opts.verbose; fprintf('\n\tDiagnostic Speed, generating figures - hope you figure out what is going on.....');  end       
-        stats = CNMF_Stats(W,H,X,1);        
+        stats = CNMF_Stats(W,H,X,1);  
+        fh=figure('units','normalized','position',[0.1 0.1 0.8 0.8]);
         for iter = 1:numel(fit_type)  
             tic
             if fit_type(iter) == 1 
-                [W,H] = CNMF_ALS(X,W,H,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_ALS(X,W,H,update_w(iter));
             else
-                [W,H] = CNMF_pMU(X,W,H,opts,mod(iter,opts.w_update_iter)+1);
+                [W,H] = CNMF_pMU(X,W,H,opts,update_w(iter));
             end
-            stats(1,iter+1) = CNMF_Stats(W,H,X,1);
-            stats(1,iter+1).duration = toc;
-            %visualize
-            fh=figure('units','normalized','position',[0.1 0.1 0.8 0.8]);
-            VisualizeData(X,W,H,fh);
+            stats(iter+1) = CNMF_Stats(W,H,X,1);
+            %visualize           
+            VisualizeData(tensor_convolve(W,H),W,H,fh);
         end                   
         
         

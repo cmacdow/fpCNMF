@@ -33,9 +33,9 @@ parpool(parcluster('local'));
 parfor block = 1:numel(data_train)
     fprintf('\n Working on block %d of %d',block,numel(data_train));   
     if block ==1 %generate example figures
-        [W{block}, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,1);    
+        [W{block}, ~, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,1);    
     else
-        [W{block}, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,0);    
+        [W{block}, ~, stats_train{block}, stats_test{block}] = FitandValidateMotifs(data_train{block},data_test{block},opts,0);    
     end
 end
 

@@ -1,10 +1,14 @@
 function opts = SyntheticDataOptions(varargin)
 %default options for synthetic data fitting example
 
+%general options
+opts.originaldimensions = 1; %the pixel x pixel dimensions of each frame. set to 1 if not working with imaging data
+
 %General CNMF options
 opts.paramsweep_non_penalized_iter = 10;
 opts.K = [1,2,3,4,6,10];
 opts.L = 20;
+opts.non_penalized_iter = [];
 opts.max_non_penalized_iter =10; 
 opts.w_update_iter = 1;
 opts.speed = 'fast';
