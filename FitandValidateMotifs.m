@@ -11,14 +11,17 @@ end
 if numel(opts.lambda)>1
     if opts.verbose; fprintf('\nFitting Lambda'); end
     lambda = FitLambda(data_train,[],opts,genfigs);
+else
+    lambda = opts.lambda;
 end
 
 %Fit Motifs To Training Data And Collect Statistics
 if opts.verbose; fprintf('\nFitting Training Data'); end
-tic; [W,H,stats_train] = fpCNMF(data_train,'L',opts.L,'K',opts.K,'non_penalized_iter',...
+[W,H,stats_train] = fpCNMF(data_train,'L',opts.L,'K',opts.K,'non_penalized_iter',...
     opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
     'speed','fast','verbose',opts.verbose,'lambda',lambda,...
-    'ortho_H',opts.ortho_H,'w_update_iter',opts.w_update_iter); toc
+    'ortho_H',opts.ortho_H,'w_update_iter',opts.w_update_iter);
+    stats_train.lambda = lambda;
 
 %Remove Empty Motifs 
 [W,H] = RemoveEmptyMotifs(W,H);

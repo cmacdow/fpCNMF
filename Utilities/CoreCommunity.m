@@ -26,7 +26,7 @@ core_community_values = cell(1,numel(val));
 for i = 1:numel(val)
     cur_com_id = find(idx_louvain==val(i));
     [cur_com, location] = sort(number_within(cur_com_id),'ascend');   
-    x = floor(top_fraction*length(cur_com));
+    x = ceil(top_fraction*length(cur_com));
     location = location(end-x+1:end);
     core_community_indices{i} = cur_com_id(location);
     core_community_values{i} = cur_com(end-x+1:end);

@@ -3,6 +3,8 @@ function [W_basis, kval, ovr_q, cluster_idx, idx_knn, tcorr_mat, handles] = Clus
 %file_list is the full path of each file with motifs to cluster. motifs are
 %contained in variable 'w' as a pxl x motif x time tensor
 
+if nargin <3; nanpxs = []; end %masked pixels for imaging data
+
 if iscell(W) %combine mutliple CNMF Fits stored in a cell array
    W = cat(2,W{:});
 end
@@ -10,10 +12,6 @@ end
 %Remove empty motifs 
 W = RemoveEmptyMotifs(W);
 
-if nargin <3 %masked pixels for imaging data
-    nanpxs = find(nanvar(reshape(W,[size(W,1),size(W,2)*size(W,3)]),[],2)<=eps);
-    W(nanpxs,:,:) = [];
-end
 
 [N, ~, L] = size(W);
 
@@ -25,7 +23,7 @@ else
 end
 
 %compute maximum temporal xcorrelation between motifs
-[tcorr_mat, lag_mat, lags] = TemporalXCorrTensor_BigData(W_smooth,ceil(L/2),1);
+[tcorr_mat, lag_mat, lags] = TemporalXCorrTensor(W_smooth,L,1);
 
 %Cluster using desired method
 switch opts.clust_method

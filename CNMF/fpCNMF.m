@@ -48,9 +48,22 @@ update_w(update_w_idx)=1;
 %% CNMF
 
 switch opts.speed 
+    case 'fast-gpu' %barebones. just fit. no reconstructions
+        if opts.verbose; fprintf('\n\tZoom zoom! Speediness activated! Only final statistics computed\n');  end
+        X = gpuArray(X); W = gpuArray(W); H = gpuArray(H);
+        for iter = 1:numel(fit_type)                 
+            if fit_type(iter) == 1 
+                [W,H] = CNMF_ALS(X,W,H,update_w(iter));
+            else
+                [W,H] = CNMF_pMU(X,W,H,opts,update_w(iter));
+            end
+        end
+        X = gather(X); W = gather(W); H = gather(H);
+        stats =CNMF_Stats(W,H,X,1);
+    
     case 'fast' %barebones. just fit. no reconstructions
         if opts.verbose; fprintf('\n\tZoom zoom! Speediness activated! Only final statistics computed\n');  end
-        for iter = 1:numel(fit_type)                 
+        for iter = 1:numel(fit_type)        
             if fit_type(iter) == 1 
                 [W,H] = CNMF_ALS(X,W,H,update_w(iter));
             else
