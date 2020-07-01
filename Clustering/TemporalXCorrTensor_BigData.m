@@ -17,6 +17,7 @@ if verbose; fprintf('\n\n\n\n\nCalculating Cross Correlations (now would be a go
 % precompute the shifts
 fprintf('\n Precomputing and Saving Shifts')
 % create a temp directory. Add random for multiple instances
+rng('shuffle');
 outDir = [pwd filesep sprintf('tmp_%d',randperm(10000,1)), filesep];
 if ~exist(outDir,'dir'); mkdir(outDir); end
 for i = 1:N

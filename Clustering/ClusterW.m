@@ -1,4 +1,4 @@
-function [W_basis, kval, ovr_q, cluster_idx, idx_knn, tcorr_mat, handles] = ClusterW(W,opts,nanpxs)
+function [W_basis, kval, ovr_q, cluster_idx, idx_knn, tcorr_mat, handles, lag_mat, lags, nanpxs] = ClusterW(W,opts,nanpxs)
 %camden macdowell - timeless
 %file_list is the full path of each file with motifs to cluster. motifs are
 %contained in variable 'w' as a pxl x motif x time tensor
@@ -10,7 +10,7 @@ end
 %Remove empty motifs 
 W = RemoveEmptyMotifs(W);
 
-if nargin <3 %masked pixels for imaging data
+if nargin <3 %masked pixels if using recordings from different mice
     nanpxs = find(nanvar(reshape(W,[size(W,1),size(W,2)*size(W,3)]),[],2)<=eps);
     W(nanpxs,:,:) = [];
 end
@@ -32,6 +32,7 @@ switch opts.clust_method
     case 'PhenoCluster' %use phenograph
         if numel(opts.clust_knn)>1 %optionally estimate a reasonable k value
             [kval, ~] = FitPhenoK(tcorr_mat,'k_range',opts.clust_knn,'louvain_restarts',opts.clust_louvain_restarts,'genfigs',1,'verbose',1);
+            kval = 15; 
         else; kval = opts.clust_knn; 
         end
         [cluster_idx, idx_knn, ovr_q] = PhenoCluster(tcorr_mat,'k',kval,'louvain_restarts',opts.clust_louvain_restarts,'Verbose',1);   
