@@ -30,14 +30,14 @@ elseif numel(kernel) == 3 && xydimensions(1)>1 && xydimensions(2)>1 %for imaging
         temp = conditionDffMat(squeeze(X(:,k,:))',nanpxs,[],[xydimensions,size(X,3)]);
         bad_pxls = isnan(temp); 
         temp(bad_pxls)=0;
-        temp = imgaussfilt3(temp,kernel);
+        temp = imgaussfilt3(temp,'FilterSize',kernel);
         if nobleed %prevents smoothing to bleed into any masked regions (vs. smoothing over small imperfections)
             temp(bad_pxls)=0;
         end
         temp = conditionDffMat(temp)';
         X_temp(:,k,:) = reshape(temp,size(X_temp,1),1,L);
     end    
-    X_temp((nanvar(reshape(X_temp,[size(X_temp,1),size(X_temp,2)*size(X_temp,3)]),[],2)<=eps)==1,:,:) = [];
+    X_temp(find(nanvar(reshape(X_temp,[size(X_temp,1),size(X_temp,2)*size(X_temp,3)]),[],2)<=eps),:,:) = [];
     X=X_temp;    
 elseif ismember(numel(kernel),[2,3]) && isempty(xydimensions)
     error('P x P dimesions for 3D conversion not supplied');

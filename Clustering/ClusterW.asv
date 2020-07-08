@@ -10,11 +10,16 @@ end
 %Remove empty motifs 
 W = RemoveEmptyMotifs(W);
 
+if nargin <3 %masked pixels if using recordings from different mice
+    nanpxs = find(nanvar(reshape(W,[size(W,1),size(W,2)*size(W,3)]),[],2)<=eps);
+    W(nanpxs,:,:) = [];
+end
+
 [N, ~, L] = size(W);
 
 %optional 2D or 3D gaussian smooth. Reccomended for noisy data. 
 if ~isempty(opts.clust_smooth_kernel)
-    W_smooth = GaussianSmoothTensor(W,opts.clust_smooth_kernel,opts.originaldimensions,nanpxs,opts.clust_nobleed);
+    W_smooth = GaussianSmoothTensor(W,opts.clust_smooth_kernel,opts.originaldimensions,nanpxs);
 else
     W_smooth = W; 
 end

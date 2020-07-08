@@ -18,7 +18,7 @@ X(isnan(X))=0; %remove nan so don't spread while smoothing
 
 data_smooth = NaN(size(X));
 for i = 1:size(X,3)
-    data_smooth(:,:,i) = imgaussfilt(X(:,:,i),'FilterSize',kernel,'filterdomain','spatial');
+    data_smooth(:,:,i) = imgaussfilt(X(:,:,i),kernel,'filterdomain','spatial');
 end
 
 data_smooth(idx)=0; %set the NaN's back to zero since they now have non-zero values
