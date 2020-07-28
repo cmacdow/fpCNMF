@@ -19,7 +19,7 @@ for t = 1:T
 end
 
 %normalize H and W
-[W,H] = NormWH(W,H,N,K,L);
+[W,H] = NormWH(W,H);
 
 %update W
 h_block = BlockH(H,L); %make H into a block matrix format

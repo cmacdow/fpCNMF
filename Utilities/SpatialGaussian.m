@@ -1,8 +1,9 @@
-function data_smooth = SpatialGaussian(X,kernel)
+function data_smooth = SpatialGaussian(X,kernel,type)
 %Camden MacDowell - timeless
 %X = pixel x pixel x time tensor
 %Applies spatial gaussian filter to all data
 
+if nargin <3; type  = 'sigma'; end
 %get nan values; 
 idx = isnan(X);
 
@@ -18,7 +19,15 @@ X(isnan(X))=0; %remove nan so don't spread while smoothing
 
 data_smooth = NaN(size(X));
 for i = 1:size(X,3)
-    data_smooth(:,:,i) = imgaussfilt(X(:,:,i),kernel,'filterdomain','spatial');
+    switch type
+        case 'sigma'             
+            data_smooth(:,:,i) = imgaussfilt(X(:,:,i),kernel,'filterdomain','spatial');
+        case 'kernel'
+            data_smooth(:,:,i) = imgaussfilt(X(:,:,i),'filterdomain','spatial','filtersize',kernel);
+        otherwise
+            error('unknown type');
+    end
+    
 end
 
 data_smooth(idx)=0; %set the NaN's back to zero since they now have non-zero values

@@ -33,7 +33,7 @@ end
 H = H .* WTX ./ (WTXest + penalty + eps);
 
 %normalize W and H 
-[W,H] = NormWH(W,H,N,K,L);
+[W,H] = NormWH(W,H);
 
 if update_W ==1 %option to skip w_update
     Xest = tensor_convolve(W,H); % Compute Estimate

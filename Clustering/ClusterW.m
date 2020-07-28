@@ -19,6 +19,9 @@ else
     W_smooth = W; 
 end
 
+%Reconstruct full W. This is used for averaging to make the basis motifs. 
+W = MaskTensor(W,nanpxs,[opts.originaldimensions(1)*opts.originaldimensions(2),size(W,2),size(W,3)]); 
+
 %compute maximum temporal xcorrelation between motifs
 [tcorr_mat, lag_mat, lags] = TemporalXCorrTensor_BigData(W_smooth,ceil(L/2),1);
 
@@ -44,16 +47,20 @@ end
         
         
 %visualize cross correlation matrix
+fprintf('\n\tPlotting similarity matrix')
 Plot_OrderedSimilarityMatrix(tcorr_mat,cluster_idx);
 
 %Get core community to average for basis motifs
+fprintf('\n\tComputing Core Community')
 [core_comm_idx, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction); 
 
 %Allign motifs in each cluster to one of the core community members 
+fprintf('\n\tAlligning W')
 W_alligned = AllignW(W,core_comm_idx,lags,cluster_idx,lag_mat);
 
 %compute basis motifs
-W_basis = NaN(N,numel(core_comm_idx),size(W_alligned,3));
+fprintf('\n\tComputing Basis Motifs')
+W_basis = NaN(size(W,1),numel(core_comm_idx),size(W_alligned,3));
 for i = 1:numel(core_comm_idx)   
     W_basis(:,i,:) = nanmean(W_alligned(:,core_comm_idx{i},:),2);
 end

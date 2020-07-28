@@ -37,7 +37,7 @@ X = [zeros(N,opts.L), X, zeros(N,opts.L)];
 H = [zeros(opts.K,opts.L),max(X(:))*rand(opts.K,T),zeros(opts.K,opts.L)];
 
 %normalize
-[W,H] = NormWH(W,H,N,opts.K,opts.L);
+[W,H] = NormWH(W,H);
 
 %generate vector of fit types (could be expanded to include different algs
 fit_type = [ones(1,opts.non_penalized_iter),zeros(1,opts.penalized_iter)];
@@ -49,7 +49,7 @@ update_w(update_w_idx)=1;
 
 switch opts.speed 
     case 'fast-gpu' %barebones. just fit. no reconstructions
-        if opts.verbose; fprintf('\n\tZoom zoom! Speediness activated! Only final statistics computed\n');  end
+        if opts.verbose; fprintf('\n\tUNLEASH THE GLORIOUS POWER OF THE GPU! Only final statistics computed\n');  end
         X = gpuArray(X); W = gpuArray(W); H = gpuArray(H);
         for iter = 1:numel(fit_type)                 
             if fit_type(iter) == 1 
