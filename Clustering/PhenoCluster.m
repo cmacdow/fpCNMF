@@ -25,7 +25,7 @@ for i = 1:sel_N
     if mod(i, round(sel_N/10)) == 0 && opts.verbose, fprintf('\t%d%% done...\n', round(i/sel_N*100)); end
 end %node loop
 w = (w+w') - eye(size(w,1)).*diag(w); %symmetrize 
-if opts.verbose; printf('done.\n'); end
+if opts.verbose; fprintf('done.\n'); end
 
 % Louvain community detection to find clusters
 if opts.verbose; fprintf('Clustering...'); end

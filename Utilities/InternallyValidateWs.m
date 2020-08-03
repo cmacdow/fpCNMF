@@ -16,12 +16,13 @@ for i = 1:N   %loop through fits
             targetfun = @min;
             %         figure; histogram(X(:)-Xhat(:));
         case 'BIC'
-            Xhat = tensor_convolve(Ws(:,1:k,:),Hs(1:k,:));        
+            Xhat = tensor_convolve(Ws{i},Hs{i});          
             r_var = nanvar(X(:)-Xhat(:));
             crit(i) = k*log(numel(X)) - (2*log(r_var));
             targetfun = @min;
         case 'PEV'
-            crit(i) = CalculateExplainedVariance(X,X-tensor_convolve(Ws(:,1:k,:),Hs(1:k,:)));  
+            crit(i) = CalculateExplainedVariance(X,X-tensor_convolve(Ws{i},Hs{i}));  
+            targetfun = @max;
         otherwise 
             error('unknown crossvalidation criterion'); 
     end %switch

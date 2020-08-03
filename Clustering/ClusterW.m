@@ -50,9 +50,15 @@ end
 fprintf('\n\tPlotting similarity matrix')
 Plot_OrderedSimilarityMatrix(tcorr_mat,cluster_idx);
 
+fprintf('\n\tGenerating Basis Motifs')
 %Get core community to average for basis motifs
-fprintf('\n\tComputing Core Community')
-[core_comm_idx, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction); 
+if numel(opts.clust_community_fraction)>1 %find the best core_community_fraction
+    fprintf('\n\t Autofitting Community Fractions');
+    [core_comm_idx, ~] = AutoFitCommunityFraction(cluster_idx,idx_knn,opts,W_smooth,lag_mat,lags);        
+else %just take the set value
+    fprintf('\n\t Using Set Community Fraction');
+    [core_comm_idx, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction); 
+end
 
 %Allign motifs in each cluster to one of the core community members 
 fprintf('\n\tAlligning W')
