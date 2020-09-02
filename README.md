@@ -3,7 +3,7 @@ This package includes MATLAB implementations of algorithms for using CNMF to dis
 
 If you use this package in published work, please cite our work and the amazing work of those that developed the original algorithms (detailed below).   
 
-Our work: CJ MacDowell, TJ Buschman. Low-Dimensional Spatio-Temporal Dynamics Underlie Cortex Wide Neural Activity. Biorxiv 2020 https://doi.org/10.1101/2020.01.05.895177
+Our work: CJ MacDowell, TJ Buschman. Low-Dimensional Spatio-Temporal Dynamics Underlie Cortex Wide Neural Activity. Current Biology 2020 https://doi.org/10.1016/j.cub.2020.04.090
 
 Previously published algorithms:
 
