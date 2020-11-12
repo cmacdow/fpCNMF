@@ -30,7 +30,7 @@ switch opts.clust_method
     case 'PhenoCluster' %use phenograph
         %compute maximum temporal xcorrelation between motifs
         [tcorr_mat, lag_mat, lags] = TemporalXCorrTensor_BigData(W_smooth,ceil(L/2),1);
-        if numel(opts.clust_knn)>1 %optionally estimate a reasonable k value (in development)
+        if numel(opts.clust_knn)>1 %optionally estimate a reasonable k value
             [kval, ~] = FitPhenoK(tcorr_mat,'k_range',opts.clust_knn,'louvain_restarts',opts.clust_louvain_restarts,'genfigs',1,'verbose',0);
         else; kval = opts.clust_knn; 
         end
@@ -43,7 +43,34 @@ switch opts.clust_method
            opts.clust_epsilon = FitDBSCANepsilon(diss_tcorr_mat, opts.clust_minpts, 1);
         end
         cluster_idx = dbscan(diss_tcorr_mat,opts.clust_epsilon,opts.clust_minpts,'Distance','precomputed');
-       
+        
+    case 'CNMF' %In progress. Uses a second round of fpCNMF to cluster motifs. 
+        temp = arrayfun(@(n) cat(2,squeeze(W_smooth(:,n,:)),zeros(size(W_smooth,1),size(W_smooth,3))),1:size(W_smooth,2),'UniformOutput',0);
+        temp = cat(2,temp{:});
+        
+        %Fit Lambda Penalty Term
+        lambda = FitLambda(data_train,[],opts,genfigs);
+
+
+        %Fit Motifs To Training Data And Collect Statistics
+        W_temp = cell(1,opts.repeat_fits);
+        H_temp = cell(1,opts.repeat_fits);
+        stats_train_temp =cell(1,opts.repeat_fits);
+        for cur_fit = 1:opts.repeat_fits %fit multiple times due to random initialization
+            if opts.verbose; fprintf('\nFitting Training Data Round %d of %d',cur_fit,opts.repeat_fits); end
+            [W_temp,H_temp,stats_train_temp] = fpCNMF(temp,'L',13,'K',20,'non_penalized_iter',...
+                opts.non_penalized_iter,'penalized_iter',50,...
+                'speed','fast','verbose',opts.verbose,'lambda',0.001,...
+                'ortho_H',opts.ortho_H,'w_update_iter',opts.w_update_iter,...
+                'sparse_H',opts.sparse_H);  
+            %Remove Empty Motifs 
+            [W_temp{cur_fit},H_temp{cur_fit}] = RemoveEmptyMotifs(W_temp{cur_fit},H_temp{cur_fit});
+        end
+        %choose best fit
+        idx = InternallyValidateWs(data_train,W_temp,H_temp,opts.fit_criterion,1);
+        W = W_temp{idx}; H = H_temp{idx}; stats_train = stats_train_temp{idx}; 
+        stats_train.lambda = lambda;     
+        
         
     otherwise
         error('%s is an unsupported clustering method',opts.clust_method);

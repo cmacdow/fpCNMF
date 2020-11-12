@@ -1,7 +1,7 @@
-function [core_comm_idx,core_comm_size,idx,crit_val] = AutoFitCommunityFraction(cluster_idx,idx_knn,opts,W_smooth,lag_mat,lags)
+function [core_comm_idx,core_comm_size,idx,crit_val] = AutoFitCommunityNumber(cluster_idx,idx_knn,opts,W_smooth,lag_mat,lags)
     criteria = NaN(numel(unique(cluster_idx)),numel(opts.clust_community_fraction));
     for cur_lvl = 1:numel(opts.clust_community_fraction) 
-        [core_comm_idx, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction(cur_lvl),0); 
+        [core_comm_idx, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction(cur_lvl),1); 
 
         %Allign motifs in each cluster to one of the core community members 
         W_alligned = AllignW(W_smooth,core_comm_idx,lags,cluster_idx,lag_mat);
@@ -48,7 +48,7 @@ function [core_comm_idx,core_comm_size,idx,crit_val] = AutoFitCommunityFraction(
     core_comm_size = NaN(1,numel(idx));
     for cur = 1:numel(idx)
         %get the dyanmicsness of the average motifs
-        [temp, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction(idx(cur))); 
+        [temp, ~] = CoreCommunity(cluster_idx,idx_knn,opts.clust_community_fraction(idx(cur)),1); 
         core_comm_idx{cur} = temp{cur};
         core_comm_size(cur) = opts.clust_community_fraction(idx(cur));
     end

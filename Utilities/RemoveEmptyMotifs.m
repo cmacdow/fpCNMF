@@ -7,7 +7,7 @@ indempty = indempty | (max(sum(W,3),[],1).^2> .5*sum(sum(W,3).^2,1)); % or one p
 
 temp = logical(size(indempty));
 for i = 1:size(W,2)
-   temp(i) = (max(squeeze(sum(W(:,i,:),1)),[],1).^2> .50*sum(squeeze(sum(W(:,i,:),1)).^2,1)); % or one timepoint has >50% of the power 
+   temp(i) = (max(squeeze(sum(W(:,i,:),1)),[],1).^2> .90*sum(squeeze(sum(W(:,i,:),1)).^2,1)); % or one timepoint has >50% of the power 
 end
 indempty = indempty | temp;
 W(:,indempty,:) = []; % Delete factors that meet the above critera
