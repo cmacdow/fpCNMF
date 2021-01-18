@@ -15,7 +15,6 @@ W = max(eps(),W);
 % Compute Estimate
 Xest = tensor_convolve(W,H);
 
-
 % Compute CNMF Update 
 WTX = zeros(K,T);
 WTXest = zeros(K,T);
