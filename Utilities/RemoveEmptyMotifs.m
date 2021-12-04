@@ -1,4 +1,4 @@
-function [W,H] = RemoveEmptyMotifs(W,H)
+function [W,H,indempty] = RemoveEmptyMotifs(W,H)
 
 if nargin <2; H =[]; end
 

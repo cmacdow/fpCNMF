@@ -7,7 +7,11 @@ if nargin <4; num_flag = 0; end %use number instead of fraction
 relationships = NaN(size(Idx_knn));
 for i = 1:size(Idx_knn,1)
     for j = 1:size(Idx_knn,2)
-        relationships(i,j) = idx_louvain(Idx_knn(i,j));
+        if ~isnan(Idx_knn(i,j)) %added 12/3/2021 to adapt function for removal of some neighbors when clustering within an animal
+            relationships(i,j) = idx_louvain(Idx_knn(i,j));
+        else
+            relationships(i,j) =NaN;
+        end
     end
 end
 
@@ -15,7 +19,7 @@ end
 %community
 number_within = NaN(size(relationships,1),1);
 for i = 1:size(relationships,1)
-    number_within(i) = sum(relationships(i,:)==relationships(i,1));
+    number_within(i) = nansum(relationships(i,:)==relationships(i,1));
 end
 
 %Get only the ones that are most within community

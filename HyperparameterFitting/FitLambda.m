@@ -1,4 +1,4 @@
-function [lambda, fh] = FitLambda(X,W,opts,genfigs)
+function [lambda, fh, cost_norm, reg_norm] = FitLambda(X,W,opts,genfigs)
 %Camden MacDowell - timeless. Follows Mackevivious et al., 2018, eLife
 if nargin <4; genfigs =1; end
 

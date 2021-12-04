@@ -1,4 +1,4 @@
-function [W,shiftvec] = ShiftW(W,shift_in)
+function [W,shiftvec,Wpad] = ShiftW(W,shift_in)
     %adapted from from seqNMF toolbox
     % shift factors by center of mass
     if nargin <2 %if the desired shift is not specified then shift by center of mass

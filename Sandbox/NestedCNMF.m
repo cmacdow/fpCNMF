@@ -1,9 +1,43 @@
-function [W, H, stats_train, stats_test] = FitandValidateMotifs(data_train,data_test,opts,genfigs)
+function [W, H, stats_train, stats_test] = NestedCNMF(path_processed,opts,genfigs)
 %Camden MacDowell - timeless
 
 %for reproducibility
 rng('default');
 
+%grab the fit motifs for this group
+[folder_st,file_st] = fileparts(path_processed);
+[fn_motifs,~] = GrabFiles([file_st,'\w*chunk\w*.mat'],0,{folder_st}); 
+
+%load the motifs 
+w = {};
+for i =1:numel(fn_motifs)
+    temp = load(fn_motifs{i},'w');
+    w{i} = temp.w;
+end
+w = cat(2,w{:});
+
+%normalize
+for i = 1:size(w,2)
+    temp = squeeze(w(:,i,:));
+    w(:,i,:) = (temp-min(temp(:)))./(max(temp(:))-min(temp(:)));
+end
+
+%get a subset of motifs pad with zeros and refit
+n_motifs = 40;
+n_runs = 10;
+for i = 1:n_runs %subsample 10 random collections of motifs
+   idx = randperm(size(w,2),n_motifs);
+   temp = arrayfun(@(n) cat(2,squeeze(w(:,n,:)),zeros(size(w,1),15)), idx,'UniformOutput',0);
+   temp = cat(2,temp{:});
+   [W_temp{i}, H{i}, stats_train{i}, stats_test{i}] = FitIter(temp,opts,0);
+   W{i} = cat(2,W_temp{i});
+end
+
+
+end %function 
+
+
+function [W, H, stats_train, stats_test] = FitIter(data_train,opts,genfigs)
 %Determine the number of non-penalized iterations
 if isempty(opts.non_penalized_iter) 
     if opts.verbose; fprintf('\nFitting non penalized iterations'); end
@@ -13,7 +47,7 @@ end
 %Optionally Fit Lambda Penalty Term
 if numel(opts.lambda)>1
     if opts.verbose; fprintf('\nFitting Lambda'); end
-    [lambda,~,cost_norm,reg_norm] = FitLambda(data_train,[],opts,genfigs);
+    lambda = FitLambda(data_train,[],opts,genfigs);
 else
     lambda = opts.lambda;
 end
@@ -36,27 +70,6 @@ end
 idx = InternallyValidateWs(data_train,W_temp,H_temp,opts.fit_criterion,1);
 W = W_temp{idx}; H = H_temp{idx}; stats_train = stats_train_temp{idx}; 
 stats_train.lambda = lambda; 
-stats_train.lambdafit_cost = cost_norm;
-stats_train.lambdafit_reg = reg_norm;
-
-
-if genfigs %visualize example fit
-   VisualizeData(tensor_convolve(W,H),W,H);
-   title('Example Fit To Training Data','Fontweight','normal','Fontsize',16); drawnow
-end   
-
-%Cross-validate to testing data by only fitting temporal weightings
-if opts.verbose; fprintf('\nFitting Testing Data'); end
-[Wxval,Hxval,stats_test] = fpCNMF(data_test,'non_penalized_iter',...
-    opts.non_penalized_iter,'penalized_iter',opts.penalized_iter,...
-    'speed','fast','verbose',0,'lambda',lambda,'w_update_iter',0,...
-    'ortho_H',opts.ortho_H,'W',W,'sparse_H',opts.sparse_H);
-
-
-if genfigs %visualize example fit
-    VisualizeData(tensor_convolve(Wxval,Hxval),Wxval,Hxval);
-    title('Example Fit To Testing Data','Fontweight','normal','Fontsize',16); drawnow
-end  
 
 end
 

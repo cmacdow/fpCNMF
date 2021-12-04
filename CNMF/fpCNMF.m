@@ -22,6 +22,8 @@ opts = ParseOptionalInputs(opts,varargin);
 
 [N, T] = size(X);
 
+assert(sum(X(:)<0)==0,'Data contains negative numbers')
+
 %initialize W, if exists, then adjust K and L accordingly
 if isempty(opts.W)
     W = max(X(:))*rand(N, opts.K, opts.L);
